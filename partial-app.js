@@ -1,10 +1,19 @@
 /** @jsx React.DOM */
 var React = require('react');
-//var RfRouter = require('react-router');
-//var Routes = RfRouter.Routes;
-//var Route = RfRouter.Route;
-//var Link = RfRouter.Link;
+var RfRouter = require('./vendor/react-router');
+var Routes = RfRouter.Routes;
+var Route = RfRouter.Route;
+var Link = RfRouter.Link;
 
+function asyncLoadScript(url, onLoad, onError) {
+	var el = document.createElement('script');
+	var first_script = document.getElementsByTagName('script')[0] || document.head.children[0];
+
+	el.onload = onLoad;
+	el.onerror = onError;
+	el.src = url;
+	first_script.parentNode.insertBefore(el, first_script);
+}
 
 var Main = React.createClass({
 	render: function() {
@@ -19,40 +28,49 @@ var Main = React.createClass({
 });
 
 var AsyncJSXRoute = {
-	routeCache: {},
+	getInitialState: function() {
+		return {
+			FullRouteComponent: null
+		};
+	},
+
 	load: function() {
-//		if (this.routeCache[this.globalName]) {
-//			return;
-//		}
-
-		try {
-			var component = require(this.moduleName);
-		} catch( e ) {
-
+		if (this.state.FullRouteComponent) {
+			return;
 		}
-		console.log( component );
 
-//		require([], function() {
-//			console.log('loading', this.globalName, this.filePath);
-//			this.routeCache[this.globalName] = require('./async-components/' + this.filePath);
-//			this.forceUpdate();
-//		}.bind(this));
+		asyncLoadScript(
+			'bundle/' + this.moduleName + '.js',
+			function() {
+				this.setState({
+					FullRouteComponent: require('./' + this.moduleName)
+				});
+			}.bind(this),
+			function() {
+				throw new Error('Failed to load bundle "' + this.moduleName + '"');
+			}.bind(this)
+		);
 	},
 
 	componentDidMount: function() {
-		setTimeout(this.load, 1000); // feel it good
+		try {
+			this.setState({
+				FullRouteComponent: require('./' + this.moduleName)
+			});
+		} catch( e ) {
+			setTimeout(this.load, 1000); // feel it good
+		}
 	},
 
 	render: function() {
-		var fullRoute = this.routeCache[this.globalName];
-		return fullRoute ? fullRoute(this.props) : this.preRender();
+		return this.state.FullRouteComponent
+			? this.state.FullRouteComponent(this.props) : this.preRender();
 	}
 };
 
 var PreDashboard = React.createClass({
 	mixins: [AsyncJSXRoute],
 	moduleName: 'partial-app-dashboard',
-	globalName: 'Dashboard',
 	preRender: function() {
 		return <div>Loading dashboard...</div>
 	}
@@ -60,8 +78,7 @@ var PreDashboard = React.createClass({
 
 var PreInbox = React.createClass({
 	mixins: [AsyncJSXRoute],
-	filePath: 'partial-app-inbox.js',
-	globalName: 'Inbox',
+	moduleName: 'partial-app-inbox',
 	preRender: function() {
 		return <div>Loading inbox...</div>
 	}
