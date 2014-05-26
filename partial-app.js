@@ -92,7 +92,7 @@ var App = React.createClass({
 				<ul>
 					<li><Link to="dashboard">Dashboard</Link></li>
 				</ul>
-        {this.props.activeRoute}
+				{this.props.activeRoute}
 			</div>
 			);
 	}

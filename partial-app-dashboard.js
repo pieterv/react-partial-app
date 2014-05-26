@@ -13,7 +13,7 @@ var Dashboard = React.createClass({
 					<li><Link to="/">Home</Link></li>
 					<li><Link to="inbox">Inbox</Link></li>
 				</ul>
-        {this.props.activeRoute}
+				{this.props.activeRoute}
 			</div>
 			);
 	}

@@ -93,7 +93,7 @@ var App = React.createClass({displayName: 'App',
 				React.DOM.ul(null, 
 					React.DOM.li(null, Link( {to:"dashboard"}, "Dashboard"))
 				),
-        this.props.activeRoute
+				this.props.activeRoute
 			)
 			);
 	}
