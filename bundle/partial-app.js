@@ -1,12 +1,20 @@
-
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({5001:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
-//var RfRouter = require('react-router');
-//var Routes = RfRouter.Routes;
-//var Route = RfRouter.Route;
-//var Link = RfRouter.Link;
+var RfRouter = require('./vendor/react-router');
+var Routes = RfRouter.Routes;
+var Route = RfRouter.Route;
+var Link = RfRouter.Link;
 
+function asyncLoadScript(url, onLoad, onError) {
+	var el = document.createElement('script');
+	var first_script = document.getElementsByTagName('script')[0] || document.head.children[0];
+
+	el.onload = onLoad;
+	el.onerror = onError;
+	el.src = url;
+	first_script.parentNode.insertBefore(el, first_script);
+}
 
 var Main = React.createClass({displayName: 'Main',
 	render: function() {
@@ -21,40 +29,49 @@ var Main = React.createClass({displayName: 'Main',
 });
 
 var AsyncJSXRoute = {
-	routeCache: {},
+	getInitialState: function() {
+		return {
+			FullRouteComponent: null
+		};
+	},
+
 	load: function() {
-//		if (this.routeCache[this.globalName]) {
-//			return;
-//		}
-
-		try {
-			var component = require(this.moduleName);
-		} catch( e ) {
-
+		if (this.state.FullRouteComponent) {
+			return;
 		}
-		console.log( component );
 
-//		require([], function() {
-//			console.log('loading', this.globalName, this.filePath);
-//			this.routeCache[this.globalName] = require('./async-components/' + this.filePath);
-//			this.forceUpdate();
-//		}.bind(this));
+		asyncLoadScript(
+			'bundle/' + this.moduleName + '.js',
+			function() {
+				this.setState({
+					FullRouteComponent: require('./' + this.moduleName)
+				});
+			}.bind(this),
+			function() {
+				throw new Error('Failed to load bundle "' + this.moduleName + '"');
+			}.bind(this)
+		);
 	},
 
 	componentDidMount: function() {
-		setTimeout(this.load, 1000); // feel it good
+		try {
+			this.setState({
+				FullRouteComponent: require('./' + this.moduleName)
+			});
+		} catch( e ) {
+			setTimeout(this.load, 1000); // feel it good
+		}
 	},
 
 	render: function() {
-		var fullRoute = this.routeCache[this.globalName];
-		return fullRoute ? fullRoute(this.props) : this.preRender();
+		return this.state.FullRouteComponent
+			? this.state.FullRouteComponent(this.props) : this.preRender();
 	}
 };
 
 var PreDashboard = React.createClass({displayName: 'PreDashboard',
 	mixins: [AsyncJSXRoute],
 	moduleName: 'partial-app-dashboard',
-	globalName: 'Dashboard',
 	preRender: function() {
 		return React.DOM.div(null, "Loading dashboard...")
 	}
@@ -62,8 +79,7 @@ var PreDashboard = React.createClass({displayName: 'PreDashboard',
 
 var PreInbox = React.createClass({displayName: 'PreInbox',
 	mixins: [AsyncJSXRoute],
-	filePath: 'partial-app-inbox.js',
-	globalName: 'Inbox',
+	moduleName: 'partial-app-inbox',
 	preRender: function() {
 		return React.DOM.div(null, "Loading inbox...")
 	}
@@ -85,4 +101,4 @@ var App = React.createClass({displayName: 'App',
 
 React.renderComponent(Main(null), document.body);
 
-},{"react":1}]},{},[5001]);
+},{"./vendor/react-router":"tnEs6c","react":"M6d2gk"}]},{},[1])

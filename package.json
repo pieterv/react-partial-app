@@ -12,7 +12,7 @@
     "reactify": "^0.13.1"
   },
   "scripts": {
-    "build": "browserify partial-app.js partial-app-dashboard.js --full-paths -p [ factor-bundle -o bundle/partial-app.js -o bundle/partial-app-dashboard.js ] -o bundle/common.js",
+    "build": "./build.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
