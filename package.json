@@ -1,0 +1,22 @@
+{
+  "name": "partial-app-loading",
+  "version": "0.0.0",
+  "description": "",
+  "main": "partial-app.js",
+  "dependencies": {
+    "react-router": "~0.0.0",
+    "react": "*"
+  },
+  "devDependencies": {
+    "factor-bundle": "^0.2.2",
+    "browserify": "^4.1.5",
+    "reactify": "^0.13.1"
+  },
+  "scripts": {
+    "build": "browserify partial-app.js partial-app-dashboard.js --full-paths -p [ factor-bundle -o bundle/partial-app.js -o bundle/partial-app-dashboard.js ] -o bundle/common.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+	"browserify": { "transform": [ "reactify" ] }
+}
