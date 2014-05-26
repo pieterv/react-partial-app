@@ -4,7 +4,6 @@
   "description": "",
   "main": "partial-app.js",
   "dependencies": {
-    "react-router": "~0.0.0",
     "react": "*"
   },
   "devDependencies": {
