@@ -53,7 +53,7 @@ var AsyncJSXRoute = {
 		);
 	},
 
-	componentDidMount: function() {
+	componentWillMount: function() {
 		try {
 			this.setState({
 				FullRouteComponent: require('./' + this.moduleName)
